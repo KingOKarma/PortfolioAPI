@@ -3,6 +3,7 @@ import { RouteType } from "./types/routeType";
 import env from "dotenv";
 import express from "express";
 import { githubRoute } from "./routes/github";
+import { itchRoute } from "./routes/itch";
 // import ms from "ms";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const config = env.config();
@@ -32,24 +33,25 @@ export class PortfolioClient {
             res.send(routeMapper(routes));
         });
 
-
-        let data = await githubRoute(this);
+        let gitData = await githubRoute(this);
+        let itchData = await itchRoute(process.env.ITCH_API_KEY);
 
         setInterval(async () => {
-            data = await githubRoute(this);
+            gitData = await githubRoute(this);
+            itchData = await itchRoute(process.env.ITCH_API_KEY);
         // Every 2 mins
         }, 2 * 60000);
+
 
         app.get("/github", async (req, res) => {
 
 
-            return res.send({ github: data });
+            return res.send({ github: gitData });
         });
-
 
         app.get("/itch", async (req, res) => {
 
-            res.send({ itch: { test: "test" } });
+            res.send({ itch: itchData });
         });
 
     }
